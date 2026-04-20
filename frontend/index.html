@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BlockSecure — Blockchain Security Platform</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-box">
+    <div class="auth-title">⬡ BLOCKSECURE ACCESS</div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="authUsername" placeholder="Enter username" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="authPassword" placeholder="Enter password" />
+    </div>
+    <div id="authAlert" class="alert"></div>
+    <div class="btn-group">
+      <button class="btn btn-primary" id="authBtn" onclick="authAction('login')">Login</button>
+      <button class="btn btn-secondary" onclick="authAction('register')">Register</button>
+    </div>
+    <p style="font-size:0.72rem;color:var(--text-secondary);margin-top:1rem;font-family:var(--font-mono)">
+      ▸ New user? Click Register to create account + wallet
+    </p>
+  </div>
+</div>
+
+<!-- NAVIGATION -->
+<nav>
+  <div onclick="showSection('dashboard')" class="nav-brand">⬡ BLOCK<span>SECURE</span></div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showSection('dashboard')">Dashboard</button>
+    <button class="nav-btn" onclick="showSection('explorer')">Explorer</button>
+    <button class="nav-btn" onclick="showSection('transactions')">Transactions</button>
+    <button class="nav-btn" onclick="showSection('security')">Security</button>
+    <button class="nav-btn" onclick="showSection('wallet')">Wallet</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:1rem">
+    <div class="status-dot">NODE ONLINE</div>
+    <span id="userBadge" style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-secondary)">NOT LOGGED IN</span>
+    <button class="nav-btn" onclick="logout()" style="font-size:0.7rem;padding:0.3rem 0.7rem">Logout</button>
+  </div>
+</nav>
+
+<!-- ═══════════════ DASHBOARD ═══════════════ -->
+<section class="section active" id="dashboard">
+  <div class="hero">
+    <div class="hero-title">Blockchain <span>Security</span><br/>Platform</div>
+    <div class="hero-sub">Military-grade cryptography • Real-time threat analysis • Immutable ledger</div>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="showSection('explorer')">⬡ Explore Chain</button>
+      <button class="btn btn-secondary" onclick="showSection('transactions')">⇄ Transactions</button>
+      <button class="btn btn-danger" onclick="showSection('security')">⚠ Security Lab</button>
+    </div>
+  </div>
+
+  <div class="section-title">Live Network Stats</div>
+  <div class="hero-grid">
+    <div class="stat-card">
+      <div class="stat-value" id="statBlocks">—</div>
+      <div class="stat-label">Total Blocks</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="statPending">—</div>
+      <div class="stat-label">Pending TXs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="statValid" style="font-size:1.2rem">—</div>
+      <div class="stat-label">Chain Integrity</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="statDifficulty">—</div>
+      <div class="stat-label">Mining Difficulty</div>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:2rem">Latest Block Hash</div>
+  <div class="hash-display" id="statHash" style="font-size:0.9rem">Loading...</div>
+
+  <div class="section-title" style="margin-top:2rem">System Features</div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">🔒 SHA-256 Hashing</div>
+      <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.6">Every block contains a cryptographic hash linking to the previous block, making tampering computationally infeasible.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">🔑 EC Cryptography</div>
+      <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.6">Wallets use elliptic curve secp256k1 key pairs — the same standard used by Bitcoin and Ethereum networks.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">🛡 Threat Analysis</div>
+      <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.6">Real-time transaction risk scoring with ML-style pattern detection to flag suspicious activities before confirmation.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">⛏ Proof of Work</div>
+      <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.6">Blocks are mined with configurable difficulty, requiring computational effort to add new records to the chain.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">🔐 JWT Auth</div>
+      <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.6">All protected routes require signed JWT tokens. Passwords are bcrypt hashed with 12 salt rounds.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">⚡ Rate Limiting</div>
+      <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.6">API endpoints are protected with rate limiting and Helmet.js security headers to prevent abuse attacks.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ BLOCKCHAIN EXPLORER ═══════════════ -->
+<section class="section" id="explorer">
+  <div class="section-title">Blockchain Explorer</div>
+
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">Chain Operations</div>
+        <div class="btn-group">
+          <button class="btn btn-primary" id="loadChainBtn" onclick="loadChain()">Load Chain</button>
+          <button class="btn btn-secondary" id="validateBtn" onclick="validateChain()">Validate Integrity</button>
+        </div>
+        <div id="chainAlert" class="alert"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Add Custom Block</div>
+        <div class="form-group">
+          <label>Block Data (JSON or plain text)</label>
+          <textarea id="blockData" placeholder='{ "type": "security_event", "event": "Login attempt", "ip": "192.168.1.1" }'></textarea>
+        </div>
+        <button class="btn btn-primary" id="addBlockBtn" onclick="addBlock()">⛏ Mine Block</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" style="max-height:600px;overflow-y:auto">
+        <div class="card-title">Chain Visualization</div>
+        <div class="block-chain" id="chainDisplay">
+          <div style="color:var(--text-secondary);font-family:var(--font-mono);font-size:0.85rem">Click "Load Chain" to visualize the blockchain...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ TRANSACTIONS ═══════════════ -->
+<section class="section" id="transactions">
+  <div class="section-title">Transaction Center</div>
+
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">New Transaction</div>
+        <div class="form-group">
+          <label>Recipient Address</label>
+          <input type="text" id="txTo" placeholder="0x1a2b3c4d5e6f..." />
+        </div>
+        <div class="form-group">
+          <label>Amount</label>
+          <input type="number" id="txAmount" placeholder="0.00" min="0" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label>Token</label>
+          <select id="txToken">
+            <option value="ETH">ETH — Ethereum</option>
+            <option value="BTC">BTC — Bitcoin</option>
+            <option value="SOL">SOL — Solana</option>
+          </select>
+        </div>
+        <div id="txAlert" class="alert"></div>
+        <div class="btn-group">
+          <button class="btn btn-primary" id="sendTxBtn" onclick="sendTransaction()">⇄ Send Transaction</button>
+          <button class="btn btn-secondary" id="mineBtn" onclick="minePending()">⛏ Mine Pending</button>
+        </div>
+      </div>
+
+      <!-- Threat Display -->
+      <div class="card" id="threatDisplay" style="display:none">
+        <div class="card-title">Threat Analysis Result</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-title">Pending Transaction Pool</div>
+        <button class="btn btn-secondary" onclick="loadPending()" style="margin-bottom:1rem">Refresh Pool</button>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="pendingTbody">
+              <tr><td colspan="5" style="text-align:center;color:var(--text-secondary)">No pending transactions</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Transaction Security Notes</div>
+        <div style="font-family:var(--font-mono);font-size:0.78rem;line-height:1.8;color:var(--text-secondary)">
+          ▸ Transactions &gt; $10,000 trigger medium risk flag<br/>
+          ▸ Self-transfers are flagged as high risk<br/>
+          ▸ Missing address fields = critical block<br/>
+          ▸ Risk score &ge; 80 automatically blocks TX<br/>
+          ▸ All approved TXs enter the pending pool<br/>
+          ▸ Pool is cleared when a block is mined
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SECURITY LAB ═══════════════ -->
+<section class="section" id="security">
+  <div class="section-title">Security Laboratory</div>
+
+  <div class="grid-2">
+    <!-- Hash Tool -->
+    <div class="card">
+      <div class="card-title">SHA-256 Hash Generator</div>
+      <div class="form-group">
+        <label>Input Data</label>
+        <textarea id="hashInput" placeholder="Enter any data to hash..."></textarea>
+      </div>
+      <div id="hashAlert" class="alert"></div>
+      <button class="btn btn-primary" id="hashBtn" onclick="hashData()">Compute Hash</button>
+      <div id="hashOutput"></div>
+    </div>
+
+    <!-- Threat Analyzer -->
+    <div class="card">
+      <div class="card-title">Transaction Threat Analyzer</div>
+      <div class="form-group">
+        <label>From Address</label>
+        <input type="text" id="atFrom" placeholder="0xSenderAddress" />
+      </div>
+      <div class="form-group">
+        <label>To Address</label>
+        <input type="text" id="atTo" placeholder="0xReceiverAddress" />
+      </div>
+      <div class="form-group">
+        <label>Amount (USD equivalent)</label>
+        <input type="number" id="atAmount" placeholder="0.00" min="0" />
+      </div>
+      <div id="atAlert" class="alert"></div>
+      <button class="btn btn-danger" id="atBtn" onclick="analyzeThreat()">⚠ Analyze Risk</button>
+      <div id="threatDisplay" style="margin-top:1rem"></div>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:2rem">Security Architecture</div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title" style="color:var(--neon-green)">Transport Layer</div>
+      <div style="font-family:var(--font-mono);font-size:0.78rem;line-height:1.8;color:var(--text-secondary)">
+        ▸ CORS whitelist enforcement<br/>
+        ▸ Helmet.js HTTP headers<br/>
+        ▸ Content-Security-Policy<br/>
+        ▸ X-Frame-Options: DENY<br/>
+        ▸ HSTS enforcement
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--neon-yellow)">Auth Layer</div>
+      <div style="font-family:var(--font-mono);font-size:0.78rem;line-height:1.8;color:var(--text-secondary)">
+        ▸ JWT RS256 signing<br/>
+        ▸ Token expiry: 24h<br/>
+        ▸ bcrypt + 12 salt rounds<br/>
+        ▸ Authorization middleware<br/>
+        ▸ Protected route guards
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--neon-red)">Rate & Abuse</div>
+      <div style="font-family:var(--font-mono);font-size:0.78rem;line-height:1.8;color:var(--text-secondary)">
+        ▸ 200 req / 15 min limit<br/>
+        ▸ IP-based throttling<br/>
+        ▸ Request size limit: 10MB<br/>
+        ▸ Error masking<br/>
+        ▸ Stack trace suppression
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ WALLET ═══════════════ -->
+<section class="section" id="wallet">
+  <div class="section-title">Wallet Manager</div>
+
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">My Wallet</div>
+        <div id="myWalletDisplay">
+          <div style="color:var(--text-secondary);font-family:var(--font-mono);font-size:0.85rem">Log in to view your wallet</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Generate New Wallet</div>
+        <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:1rem">Generate a fresh EC secp256k1 keypair without creating an account.</p>
+        <div id="walletAlert" class="alert"></div>
+        <button class="btn btn-secondary" id="genWalletBtn" onclick="generateWallet()">⬡ Generate Wallet</button>
+        <div id="walletOutput" style="margin-top:1rem"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-title">Cryptography Info</div>
+        <div style="font-family:var(--font-mono);font-size:0.78rem;line-height:2;color:var(--text-secondary)">
+          <div style="color:var(--neon-cyan)">KEY ALGORITHM</div>
+          <div>Elliptic Curve — secp256k1</div>
+          <br/>
+          <div style="color:var(--neon-cyan)">ADDRESS DERIVATION</div>
+          <div>SHA-256 → RIPEMD-160 → hex prefix 0x</div>
+          <br/>
+          <div style="color:var(--neon-cyan)">SIGNING</div>
+          <div>ECDSA with SHA-256</div>
+          <br/>
+          <div style="color:var(--neon-cyan)">KEY FORMAT</div>
+          <div>PKCS#8 / SPKI (PEM encoded)</div>
+          <br/>
+          <div style="color:var(--neon-cyan)">SAME CURVE AS</div>
+          <div>Bitcoin, Ethereum, Litecoin</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Security Checklist</div>
+        <div style="font-family:var(--font-mono);font-size:0.78rem;line-height:1.8;color:var(--neon-green)">
+          ✓ Private keys never leave server<br/>
+          ✓ Public keys derivable from private<br/>
+          ✓ Addresses are one-way hashes<br/>
+          ✓ Transactions require valid signature<br/>
+          ✓ Nonce prevents replay attacks<br/>
+          ✓ All RNG uses crypto.randomBytes
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="js/app.js"></script>
+<script>
+  // Show wallet info if logged in
+  if (currentUser && currentUser.wallet) {
+    const display = document.getElementById('myWalletDisplay');
+    if (display) {
+      display.innerHTML = `
+        <div class="wallet-info">
+          <div class="wallet-label">Address</div>
+          <div class="wallet-address">${currentUser.wallet.address}</div>
+          <div class="wallet-label" style="margin-top:0.8rem">Balance</div>
+          <div class="wallet-address">${currentUser.wallet.balance} tokens</div>
+          <div class="wallet-label" style="margin-top:0.8rem">Created</div>
+          <div class="wallet-address">${new Date(currentUser.wallet.createdAt).toLocaleString()}</div>
+        </div>
+      `;
+    }
+  }
+</script>
+</body>
+</html>
