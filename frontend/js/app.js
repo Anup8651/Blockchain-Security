@@ -52,7 +52,12 @@ function updateAuthUI() {
     loadDashboardStats();
   } else {
     if (authOverlay) authOverlay.style.display = 'flex';
-    if (matrixBg) matrixBg.classList.add('active');
+    if (matrixBg) {
+      matrixBg.classList.add('active');
+      // Force resize canvas when showing to fix animation
+      matrixBg.width = window.innerWidth;
+      matrixBg.height = window.innerHeight;
+    }
     if (nav) nav.style.display = 'none';
     sections.forEach(s => s.style.display = 'none');
   }
